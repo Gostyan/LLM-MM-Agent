@@ -11,7 +11,9 @@ We propose a **Mathematical Modeling Agent** that simulates the real-world human
 3. **Computational Solving**
 4. **Solution Reporting**
 
-
+<p align="center">
+   <img src="figs/Overview.pdf" alt="MM-Agent Overview" width="80%">
+</p>
 
 Our paper is available at [arXiv](https://arxiv.org/abs/2505.14148).
 
