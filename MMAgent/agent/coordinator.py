@@ -57,6 +57,7 @@ class Coordinator:
         self.task_dependency_analysis = task_dependency_analysis.split('\n\n')
         count = 0
         for i in range(5):
+            count += 1
             try:
                 dependency_DAG = self.dag_construction(len(task_descriptions), modeling_problem, problem_analysis, modeling_solution, task_descriptions, task_dependency_analysis)
                 dependency_DAG_string = dependency_DAG.strip('```json\n').strip('```')
