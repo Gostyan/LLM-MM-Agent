@@ -5,8 +5,10 @@
 
 
 ## 📰 News
-
- 1. **2025-07**
+ 1. **2025-09**
+🎉 Our paper *"MM-Agent: LLMs as Agents for Real-world Mathematical Modeling Problems"* has been accepted to the **NeurIPS 2025**!
+📄 [Read the paper on arXiv](https://arxiv.org/abs/2505.14148)
+ 2. **2025-07**
 🎉 Our paper *"MM-Agent: LLMs as Agents for Real-world Mathematical Modeling Problems"* has been accepted to the **AI4MATH Workshop at ICML 2025**!
 📄 [Read the paper on arXiv](https://arxiv.org/abs/2505.14148)
 
