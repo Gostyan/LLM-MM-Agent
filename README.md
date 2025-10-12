@@ -5,10 +5,13 @@
 
 
 ## 📰 News
- 1. **2025-09**
+1. **2025-10**
+   🚀 **MM-Agent assisted two undergraduate teams in winning the Finalist Award** (Top 2.0% among 27,456 teams) in **MCM/ICM 2025**, demonstrating its practical effectiveness as a *modeling copilot*.
+   🔗  [Demo](https://huggingface.co/spaces/MathematicalModelingAgent/MathematicalModelingAgent)
+ 2. **2025-09**
 🎉 Our paper *"MM-Agent: LLMs as Agents for Real-world Mathematical Modeling Problems"* has been accepted to the **NeurIPS 2025**!
 📄 [Read the paper on arXiv](https://arxiv.org/abs/2505.14148)
- 2. **2025-07**
+ 3. **2025-07**
 🎉 Our paper *"MM-Agent: LLMs as Agents for Real-world Mathematical Modeling Problems"* has been accepted to the **AI4MATH Workshop at ICML 2025**!
 📄 [Read the paper on arXiv](https://arxiv.org/abs/2505.14148)
 
