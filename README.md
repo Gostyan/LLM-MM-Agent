@@ -157,3 +157,9 @@ Source code is licensed under the **\[CC BY-NC]**.
    url={https://arxiv.org/abs/2505.14148}  
 }
 ```
+
+
+😝 If you like this project, don't forget to give it a ⭐!
+
+[![📈 Star History Chart](https://api.star-history.com/svg?repos=usail-hkust/LLM-MM-Agent&type=Date)](https://star-history.com/#usail-hkust/LLM-MM-Agent&Date)
+
