@@ -165,16 +165,14 @@ def save_solution(solution, name, path):
 
 
 def mkdir(path):
-    if not os.path.dirname(os.path.dirname(path)):
-        os.mkdir(os.path.dirname(os.path.dirname(path)))
-    if not os.path.dirname(path):
-        os.mkdir(os.path.dirname(path))
-    os.mkdir(path)
-    os.mkdir(path + '/json')
-    os.mkdir(path + '/markdown')
-    os.mkdir(path + '/latex')
-    os.mkdir(path + '/code')
-    os.mkdir(path + '/usage')
+    # Create parent directories if they don't exist
+    os.makedirs(path, exist_ok=True)
+    # Create subdirectories
+    os.makedirs(os.path.join(path, 'json'), exist_ok=True)
+    os.makedirs(os.path.join(path, 'markdown'), exist_ok=True)
+    os.makedirs(os.path.join(path, 'latex'), exist_ok=True)
+    os.makedirs(os.path.join(path, 'code'), exist_ok=True)
+    os.makedirs(os.path.join(path, 'usage'), exist_ok=True)
 
 
 

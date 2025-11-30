@@ -21,48 +21,41 @@ class EnvException(Exception):
 
 def execute_script(script_path, work_dir):
     try:
+        import platform
         device = 0
         python = "python"
-        cmd = f"CUDA_VISIBLE_DEVICES={device} {python} -u {script_path}"
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True, cwd=work_dir)
+        
+        # Use different command format for Windows
+        if platform.system() == "Windows":
+            cmd = f"{python} -u {script_path}"
+        else:
+            cmd = f"CUDA_VISIBLE_DEVICES={device} {python} -u {script_path}"
+        
+        process = subprocess.Popen(
+            cmd, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.PIPE, 
+            text=True, 
+            shell=True, 
+            cwd=work_dir
+        )
 
-        stdout_lines = []
-        stderr_lines = []
-
-        selector = selectors.DefaultSelector()
-        selector.register(process.stdout, selectors.EVENT_READ)
-        selector.register(process.stderr, selectors.EVENT_READ)
-
-        while process.poll() is None and selector.get_map():
-            events = selector.select(timeout=1)
-
-            for key, _ in events:
-                line = key.fileobj.readline()
-                if key.fileobj == process.stdout:
-                    print("STDOUT:", line, end =" ")
-                    stdout_lines.append(line)
-                else:
-                    print("STDERR:", line, end =" ")
-                    stderr_lines.append(line)
-
-        for line in process.stdout:
-            line = line
-            print("STDOUT:", line, end =" ")
-            stdout_lines.append(line)
-        for line in process.stderr:
-            line = line
-            print("STDERR:", line, end =" ")
-            stderr_lines.append(line)
-
+        # Wait for process to complete and get output
+        stdout, stderr = process.communicate()
         return_code = process.returncode
 
+        # Print output for debugging
+        if stdout:
+            print("STDOUT:", stdout)
+        if stderr:
+            print("STDERR:", stderr)
+
+        # Determine observation based on return code
         if return_code != 0:
-            observation = "".join(stderr_lines)
+            observation = stderr if stderr else stdout
         else:
-            observation = "".join(stdout_lines)
-        if observation == "" and return_code == 0:
-            # printed to stderr only
-            observation = "".join(stderr_lines)
+            observation = stdout if stdout else stderr
+            
         return "The script has been executed. Here is the output:\n" + observation
     except Exception as e:
         print("++++", "Wrong!")
@@ -137,6 +130,7 @@ class TaskSolver(BaseAgent):
             f.write(new_content)
         
         # Execute the script.
+        observation = ""
         try:
             observation = execute_script(script_name, work_dir)
             ## If observation is too long, we only keep the last ~2k tokens.
@@ -146,6 +140,7 @@ class TaskSolver(BaseAgent):
                 observation = observation[:2000]
                 tokens = len(enc.encode(observation))
         except Exception as e:
+            observation = f"Execution error: {str(e)}"
             print(e)
             input("Ah oh, Got stuck! Press any key to continue.")
 
@@ -171,19 +166,21 @@ class TaskSolver(BaseAgent):
             f.write(new_content)
         
         # Execute the script.
+        new_observation = ""
         try:
-            observation = execute_script(script_name, work_dir)
+            new_observation = execute_script(script_name, work_dir)
             ## If observation is too long, we only keep the last ~2k tokens.
             enc = tiktoken.get_encoding("cl100k_base")
-            tokens = len(enc.encode(observation))
+            tokens = len(enc.encode(new_observation))
             if tokens >= 2000:
-                observation = observation[:2000]
-                tokens = len(enc.encode(observation))
+                new_observation = new_observation[:2000]
+                tokens = len(enc.encode(new_observation))
         except Exception as e:
+            new_observation = f"Execution error: {str(e)}"
             print(e)
             input("Ah oh, Got stuck! Press any key to continue.")
 
-        return new_content, observation
+        return new_content, new_observation
     
     def coding(self, data_file, data_summary, variable_description, task_description: str, task_analysis: str, formulas: str, modeling: str, dependent_file_prompt: str, code_template: str, script_name: str, work_dir: str, try_num: int = 5, round: int = 1, user_prompt: str = ''):
         for i in range(try_num):
@@ -195,13 +192,17 @@ class TaskSolver(BaseAgent):
                 if iteration == 0:
                     code, observation = self.coding_actor(data_file, data_summary, variable_description, task_description, task_analysis, formulas, modeling, dependent_file_prompt, code_template, script_name, work_dir, user_prompt)
                     # If the script has been successfully executed: Exit.
-                    if "Traceback (most recent call last):" not in observation and "SyntaxError: invalid syntax" not in observation and "IndentationError" not in observation:
-                        return code, True, observation.split("The script has been executed. Here is the output:\n")[1]
+                    if "Traceback (most recent call last):" not in observation and "SyntaxError: invalid syntax" not in observation and "IndentationError" not in observation and "Execution error:" not in observation:
+                        output_parts = observation.split("The script has been executed. Here is the output:\n")
+                        execution_result = output_parts[1] if len(output_parts) > 1 else observation
+                        return code, True, execution_result
                 else:
                     code, observation = self.coding_debugger(code_template, modeling, code, observation, script_name, work_dir, user_prompt)
                     # If the script has been successfully executed: Exit.
-                    if "Traceback (most recent call last):" not in observation and "SyntaxError: invalid syntax" not in observation and "IndentationError" not in observation:
-                        return code, True, observation.split("The script has been executed. Here is the output:\n")[1]
+                    if "Traceback (most recent call last):" not in observation and "SyntaxError: invalid syntax" not in observation and "IndentationError" not in observation and "Execution error:" not in observation:
+                        output_parts = observation.split("The script has been executed. Here is the output:\n")
+                        execution_result = output_parts[1] if len(output_parts) > 1 else observation
+                        return code, True, execution_result
                 iteration += 1
 
         return code, False, None
